@@ -1,9 +1,10 @@
 import struct
-from .base cimport CHECKSUM_16BIT, CHECKSUM_32BIT
 
 STANAG_HEADER = struct.Struct('>HHLLHH')
 STRUCT_H = struct.Struct('>H')
 STRUCT_L = struct.Struct('>L')
+
+
 
 
 cdef inline unsigned int checksum_16(bytes b):
@@ -68,9 +69,9 @@ cdef class BaseDatagram:
         """
         Return the message without the checksum
         """
-        data = STANAG_HEADER.pack(self.sequence_no, len(self.payload),
-                                  self.source_id, self.destination_id,
-                                  self.message_type, self.message_properties) + self.payload
+        cdef bytes data = STANAG_HEADER.pack(self.sequence_no, len(self.payload),
+                                             self.source_id, self.destination_id,
+                                             self.message_type, self.message_properties)
         return data + self.payload
 
     def __len__(self):
@@ -109,13 +110,14 @@ cpdef list parse_datagrams(bytearray b):
         int offset = 0
         BaseDatagram bdr
         list output = []
-    while True:
+    while b[offset:]:
         try:
             bdr = parse_frame(b[offset:])
             output.append(bdr)
             offset += bdr.get_length()
         except ValueError:
             return output
+    return output
 
 
 cdef inline BaseDatagram parse_frame(bytearray b):
