@@ -21,3 +21,5 @@ cdef class BaseDatagram:
     cpdef bytes get_body(self)
     cpdef bytes to_bytes(self)
     cpdef int get_length(self)
+
+cpdef list parse_datagrams(bytearray b)

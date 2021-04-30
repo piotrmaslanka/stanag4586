@@ -1,4 +1,5 @@
 import struct
+from .base cimport CHECKSUM_16BIT, CHECKSUM_32BIT
 
 STANAG_HEADER = struct.Struct('>HHLLHH')
 STRUCT_H = struct.Struct('>H')
@@ -77,7 +78,7 @@ cdef class BaseDatagram:
 
     cpdef int get_length(self):
         """Return the length of this message"""
-        return STANAG_HEADER.calcsize() + len(self.payload) + self.checksum_length()
+        return STANAG_HEADER.size + len(self.payload) + self.checksum_length()
 
     cpdef bytes to_bytes(self):
         """Convert the message to bytes"""
@@ -95,3 +96,55 @@ cdef class BaseDatagram:
         elif checksum_length == 4:
             return body + STRUCT_L.pack(check_sum)
 
+
+cpdef list parse_datagrams(bytearray b):
+    """
+    Return a list of BaseDatagrams that can be parsed from this UDP packet
+    
+    :param b: data to examine 
+    :return: a list of datagrams
+    :rtype: tp.List[BaseDatagram]
+    """
+    cdef:
+        int offset = 0
+        BaseDatagram bdr
+        list output = []
+    while True:
+        try:
+            bdr = parse_frame(b[offset:])
+            output.append(bdr)
+            offset += bdr.get_length()
+        except ValueError:
+            return output
+
+
+cdef inline BaseDatagram parse_frame(bytearray b):
+    cdef:
+        bytes payload
+        unsigned int sequence_no,
+        unsigned int source_id
+        unsigned short payload_length
+        unsigned int destination_id,
+        unsigned short message_type
+        unsigned short message_properties
+        unsigned int checksum
+        unsigned int size_p
+    try:
+        sequence_no, payload_length, source_id, destination_id, \
+            message_type, message_properties = STRUCT_H.unpack(b[:STANAG_HEADER.size])
+    except struct.error:
+        raise ValueError()
+    size_p = STANAG_HEADER.size + payload_length
+    payload = b[STANAG_HEADER.size:size_p]
+
+    if message_properties & CHECKSUM_16BIT:
+        checksum, = STRUCT_H.unpack(b[size_p:size_p+2])
+        if checksum != checksum_16(b[:size_p]):
+            raise ValueError()
+    elif message_properties & CHECKSUM_32BIT:
+        checksum, = STRUCT_L.unpack(b[size_p:size_p+2])
+        if checksum != checksum_32(b[:size_p]):
+            raise ValueError()
+
+    return BaseDatagram(payload, sequence_no, source_id, destination_id,
+                        message_type, message_properties)
