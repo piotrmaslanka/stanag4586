@@ -1,8 +1,25 @@
 import struct
 
-STANAG_FRAME = struct.Struct('>HHLLHH')
+STANAG_HEADER = struct.Struct('>HHLLHH')
 STRUCT_H = struct.Struct('>H')
 STRUCT_L = struct.Struct('>L')
+
+
+cdef inline unsigned int checksum_16(bytes b):
+    cdef:
+        unsigned short counter = 0
+        int byte
+    for byte in b:
+        counter += byte
+    return counter
+
+cdef inline unsigned int checksum_32(bytes b):
+    cdef:
+        unsigned int counter = 0
+        int byte
+    for byte in b:
+        counter += byte
+    return counter
 
 
 cdef inline unsigned long checksum(bytes b, int checksum_length):
@@ -10,16 +27,12 @@ cdef inline unsigned long checksum(bytes b, int checksum_length):
         unsigned long modulo
         unsigned long counter = 0
         int byte
-    if checksum_length == 2:
-        modulo = 2**16
+    if checksum_length == 0:
+        return 0
+    elif checksum_length == 2:
+        return checksum_16(b)
     elif checksum_length == 4:
-        modulo = 2**32
-    else:
-        modulo = 1
-
-    for byte in b:
-        counter += byte % modulo
-    return counter
+        return checksum_32(b)
 
 
 cdef class BaseDatagram:
@@ -40,25 +53,27 @@ cdef class BaseDatagram:
         return self.to_bytes()
 
     cpdef int checksum_length(self):
-        """Return checksum length"""
+        """Return checksum length in bytes"""
         return ((self.message_properties >> 6) & 3) << 1
 
     cpdef bytes get_body(self):
         """
         Return the message without the checksum
         """
-        data = STANAG_FRAME.pack(self.sequence_no, len(self.payload),
-                                 self.source_id, self.destination_id,
-                                 self.message_type, self.message_properties) + self.payload
+        data = STANAG_HEADER.pack(self.sequence_no, len(self.payload),
+                                  self.source_id, self.destination_id,
+                                  self.message_type, self.message_properties) + self.payload
         return data + self.payload
 
     def __len__(self):
-        return STANAG_FRAME.calcsize() + len(self.payload) + self.checksum_length()
+        return self.get_length()
+
+    cpdef int get_length(self):
+        """Return the length of this message"""
+        return STANAG_HEADER.calcsize() + len(self.payload) + self.checksum_length()
 
     cpdef bytes to_bytes(self):
-        """
-        Convert the message to bytes
-        """
+        """Convert the message to bytes"""
         cdef:
             bytes body = self.get_body()
             int checksum_length = self.checksum_length()

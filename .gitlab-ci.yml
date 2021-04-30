@@ -19,7 +19,7 @@ build:
     - pip install snakehouse Cython satella
   script:
     - strip-docs .
-    - python manage.py bdist_wheel
+    - python setup.py bdist_wheel
     - cp dist/*.whl .
     - doctor-wheel *.whl
   artifacts:
