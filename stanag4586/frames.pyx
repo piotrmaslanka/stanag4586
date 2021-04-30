@@ -42,3 +42,6 @@ cdef class BaseSTANAGPayload:
             return self.presence_field + STRUCT_Q.pack(self.timestamp)[5:]
         else:
             return self.presence_field
+
+    cpdef int get_field_count(self):
+        return 1

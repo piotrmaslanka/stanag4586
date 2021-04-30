@@ -3,54 +3,48 @@ cucs_authorization_request:
     new_code: 1
     old_code: 1
     fields:
-        presence_vector:
-            type: bits
-            length: 3
-        timestamp:
-            type: bits
-            length: 5
-        data_link_id:
-            type: uint32
-        vehicle_type:
-            type: uint16
-        vehicle_subtype:
-            type: uint16
-        requested_loi:
-            type: bitmap8
-            enum:
-                - name: NA
-                  value: 1
-                - name: LOI_2
-                  value: 2
-                - name: LOI_3
-                  value: 4
-                - name: LOI_4
-                  value: 8
-                - name: LOI_5
-        requested_handover:
-            type: uint8
-        requested_flight_mode:
-            type: uint8
-        controlled_station_1_16:
-            type: uint16
-        component_number:
-            type: uint16
-        subcomponent_number:
-            type: uint16
-        payload_type:
-            type: uint16
-        asset_mode:
-            type: uint8
-        wait_for_vdl_transition_coordination:
-            type: uint8
-        cucs_type:
-            type: uint8
-        cucs_subtype:
-            type: uint16
-        presence_vector_supported:
-            type: uint8
-        controlled_station_17_32:
-            type: uint16
+        - name: data_link_id
+          type: uint32
+        - name: vehicle_type
+          type: uint16
+        - name: vehicle_subtype
+          type: uint16
+        - name: requested_loi
+          type: bitmap8
+          enum:
+            - name: NA
+              value: 1
+            - name: LOI_2
+              value: 2
+            - name: LOI_3
+              value: 4
+            - name: LOI_4
+              value: 8
+            - name: LOI_5
+        - name: requested_handover
+          type: uint8
+        - name: requested_flight_mode
+          type: uint8
+        - name: controlled_station_1_16
+          type: uint16
+        - name: component_number
+          type: uint16
+        - name: subcomponent_number
+          type: uint16
+        - name: payload_type
+          type: uint16
+        - name: asset_mode
+          type: uint8
+        - name: wait_for_vdl_transition_coordination
+          type: uint8
+        - name: cucs_type
+          type: uint8
+        - name: cucs_subtype
+          type: uint16
+        - name: presence_vector_supported
+          type: uint8
+        - name: controlled_station_17_32
+          type: uint16
 
 
 

@@ -7,4 +7,4 @@ cdef class BaseSTANAGPayload:
     cpdef to_bytes(self)
     cpdef bint has_field(self, int i)
     cpdef void set_field(self, int i, bint has)
-
+    cpdef int get_field_count(self)
