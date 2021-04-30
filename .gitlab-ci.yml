@@ -1,0 +1,41 @@
+stages:
+  - test
+  - build
+
+image: smokserwis/build:python3
+
+unittest:
+  stage: test
+  before_script:
+    - pip install snakehouse Cython satella nose2
+  script:
+    - python setup.py install
+    - nose2
+
+
+build:
+  stage: build
+  before_script:
+    - pip install snakehouse Cython satella
+  script:
+    - strip-docs .
+    - python manage.py bdist_wheel
+    - cp dist/*.whl .
+    - doctor-wheel *.whl
+  artifacts:
+    paths:
+      - "*.whl"
+
+pages:
+  stage: build
+  before_script:
+    - pip install Sphinx snakehouse Cython satella
+  script:
+    - python setup.py install
+    - cd docs
+    - make html
+    - cd ..
+    - cp -rf docs/_build/html public
+  artifacts:
+    paths:
+      - "public"
