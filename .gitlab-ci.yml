@@ -2,12 +2,14 @@ stages:
   - test
   - build
 
+before_script:
+  - pip install Sphinx snakehouse Cython satella case-converter nose2
+  - python compile_stanag.py
+
 image: smokserwis/build:python3
 
 unittest:
   stage: test
-  before_script:
-    - pip install snakehouse Cython satella nose2
   script:
     - python setup.py install
     - nose2
@@ -15,8 +17,6 @@ unittest:
 
 build:
   stage: build
-  before_script:
-    - pip install snakehouse Cython satella
   script:
     - strip-docs .
     - python setup.py bdist_wheel
@@ -30,8 +30,6 @@ pages:
   stage: build
   variables:
     DEBUG: "1"
-  before_script:
-    - pip install Sphinx snakehouse Cython satella
   script:
     - python setup.py install
     - cd docs

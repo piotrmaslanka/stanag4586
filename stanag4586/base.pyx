@@ -1,6 +1,7 @@
 import struct
 from .base cimport NO_ACK, ACK, STANAG_EDITION_3, NO_CHECKSUM, \
     CHECKSUM_16BIT, CHECKSUM_32BIT
+from .frames cimport BaseSTANAGPayload
 
 STANAG_HEADER = struct.Struct('>HHLLHH')
 STRUCT_H = struct.Struct('>H')
@@ -49,6 +50,8 @@ cdef class BaseDatagram:
     """
     A base STANAG 4586 frame
 
+    At given time you might provide either a payload or a data_payload
+
     :ivar payload: (bytes) message payload
     :ivar sequence_no: (int) sequence no
     :ivar source_id: (int) source ID
@@ -56,15 +59,19 @@ cdef class BaseDatagram:
     :ivar message_type: (int) message type
     :ivar message_properties: (int) message properties
     """
-    def __init__(self, bytes payload, unsigned int sequence_no,
+    def __init__(self, unsigned int sequence_no,
                  unsigned int source_id, unsigned int destination_id,
-                 unsigned short message_type, unsigned short message_properties):
+                 unsigned short message_type, unsigned short message_properties,
+                 bytes payload=None,
+                 BaseSTANAGPayload data_payload=None):
+        assert bool(payload) ^ bool(data_payload), 'Both payloads given!'
         self.payload = payload
         self.sequence_no = sequence_no
         self.source_id = source_id
         self.destination_id = destination_id
         self.message_type = message_type
         self.message_properties = message_properties
+        self.data_payload = data_payload
 
     def __bytes__(self):
         return self.to_bytes()
@@ -73,21 +80,37 @@ cdef class BaseDatagram:
         """Return checksum length in bytes"""
         return ((self.message_properties >> 6) & 3) << 1
 
+    cpdef int get_payload_length(self):
+        """Return payload's length"""
+        if self.payload is None:
+            return self.data_payload.length()
+        else:
+            return len(self.payload)
+
+    cpdef bytes get_payload(self):
+        """Return the payload, as bytes"""
+        if self.payload is None:
+            return self.data_payload.to_bytes()
+        else:
+            return self.payload
+
     cpdef bytes get_body(self):
         """
         Return the message without the checksum
         """
-        cdef bytes data = STANAG_HEADER.pack(self.sequence_no, len(self.payload),
+        cdef:
+            int payload_length = self.get_payload_length()
+            bytes data = STANAG_HEADER.pack(self.sequence_no, payload_length,
                                              self.source_id, self.destination_id,
                                              self.message_type, self.message_properties)
-        return data + self.payload
+        return data + self.get_payload()
 
     def __len__(self):
         return self.get_length()
 
     cpdef int get_length(self):
         """Return the length of this message"""
-        return STANAG_HEADER.size + len(self.payload) + self.checksum_length()
+        return STANAG_HEADER.size + self.get_payload_length() + self.checksum_length()
 
     cpdef bytes to_bytes(self):
         """Convert the message to bytes"""
@@ -156,5 +179,6 @@ cdef inline BaseDatagram parse_frame(bytearray b):
         if checksum != checksum_32(b[:size_p]):
             raise ValueError()
 
-    return BaseDatagram(payload, sequence_no, source_id, destination_id,
-                        message_type, message_properties)
+    return BaseDatagram(sequence_no, source_id, destination_id,
+                        message_type, message_properties,
+                        payload)

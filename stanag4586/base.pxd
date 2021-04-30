@@ -1,3 +1,5 @@
+from .frames cimport BaseSTANAGPayload
+
 cdef enum:
     NO_ACK = 0
     ACK = 0x8000
@@ -11,6 +13,7 @@ cdef enum:
 cdef class BaseDatagram:
     cdef:
         public bytes payload
+        public BaseSTANAGPayload data_payload
         public unsigned int sequence_no
         public unsigned int source_id
         public unsigned int destination_id
@@ -21,5 +24,7 @@ cdef class BaseDatagram:
     cpdef bytes get_body(self)
     cpdef bytes to_bytes(self)
     cpdef int get_length(self)
+    cpdef bytes get_payload(self)
+    cpdef int get_payload_length(self)
 
 cpdef list parse_datagrams(bytearray b)

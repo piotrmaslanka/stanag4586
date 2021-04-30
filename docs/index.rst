@@ -11,7 +11,7 @@ Welcome to STANAG4586's documentation!
    :caption: Contents:
 
    base_frame
-
+$INDEX
 
 
 Indices and tables
