@@ -28,6 +28,8 @@ build:
 
 pages:
   stage: build
+  variables:
+    DEBUG: "1"
   before_script:
     - pip install Sphinx snakehouse Cython satella
   script:
