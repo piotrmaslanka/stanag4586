@@ -91,7 +91,6 @@ def process_a_module(depo_name: str, module_name: str, module_desc: dict):
     len_fields = len(module_desc['fields'])
     pyx_args.append(f'        return super().get_field_count() + {len_fields}\n\n')
 
-
     pyx_file.write(''.join(pyx_args))
 
     docs_args = [f'.. autoclass:: stanag4586.{depo_name}.{class_name}\n'

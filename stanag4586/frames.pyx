@@ -11,6 +11,9 @@ cdef class BaseSTANAGPayload:
         self.presence_field = presence_field
         self.timestamp = timestamp
 
+    cpdef int length(self) except -1:
+        raise NotImplementedError('Abstract class!')
+
     cpdef bint has_field(self, int i):
         """
         Check if given field is present
