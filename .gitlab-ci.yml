@@ -3,7 +3,7 @@ stages:
   - build
 
 before_script:
-  - pip install Sphinx snakehouse Cython satella case-converter nose2
+  - pip install Sphinx snakehouse Cython satella case-converter nose2 yaml
   - python compile_stanag.py
 
 image: smokserwis/build:python3
