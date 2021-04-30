@@ -1,10 +1,18 @@
 import struct
+from .base cimport NO_ACK, ACK, STANAG_EDITION_3, NO_CHECKSUM, \
+    CHECKSUM_16BIT, CHECKSUM_32BIT
 
 STANAG_HEADER = struct.Struct('>HHLLHH')
 STRUCT_H = struct.Struct('>H')
 STRUCT_L = struct.Struct('>L')
 
 
+MP_NO_ACK = NO_ACK                     #: This is a command
+MP_ACK = ACK                           #: This is a response
+MP_STANAG_EDITION_3 = STANAG_EDITION_3 #: This is to be included in each STANAG 4586 datagram
+MP_NO_CHECKSUM = NO_CHECKSUM           #: This datagram has no checksum
+MP_CHECKSUM_16BIT = CHECKSUM_16BIT     #: This datagram has a 16-bit checksum
+MP_CHECKSUM_32BIT = CHECKSUM_32BIT     #: This datagram has a 32-bit checksum
 
 
 cdef inline unsigned int checksum_16(bytes b):

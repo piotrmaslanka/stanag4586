@@ -10,19 +10,18 @@ To unserialize STANAG 4586 frames you can use:
 
 .. autofunction:: stanag4586.base.parse_datagrams
 
-The message properties is a bitwise union of the following, available only via cimport:
+The message properties is a bitwise union of the following:
 
-.. code-block:: python
+.. autodata:: stanag4586.base.MP_NO_ACK
 
-    stanag4586.base.NO_ACK - This is not an ACK message
+.. autodata:: stanag4586.base.MP_ACK
 
-    stanag4586.base.ACK - This is an ACK response
+.. autodata:: stanag4586.base.MP_STANAG_EDITION_3
 
-    stanag4586.base.STANAG_EDITION_3    -    Needs to be on in every datagram
+.. autodata:: stanag4586.base.MP_NO_CHECKSUM
 
-    stanag4586.base.NO_CHECKSUM     -    This datagram will have no checksum
+.. autodata:: stanag4586.base.MP_CHECKSUM_16BIT
 
-    stanag4586.base.CHECKSUM_16BIT  -   This datagram will have 16-bit checksum
+.. autodata:: stanag4586.base.MP_CHECKSUM_32BIT
 
-    stanag4586.base.CHECKSUM_32BIT  -   This datagram will have 32-bit checksum
-
+Corresponding constants are :code:`cimport`able, but strip the :code:`MP_`.
