@@ -95,7 +95,7 @@ def process_a_module(depo_name: str, module_name: str, module_desc: dict):
 
     docs_args = [f'{depo_name}\n',
                  '=' * len(depo_name) + '\n',
-                 f'.. autoclass:: stanag4586.{depo_name}.{class_name}\n'.
+                 f'.. autoclass:: stanag4586.{depo_name}.{class_name}\n',
                  f'    :members:\n']
 
     doc_file.write(''.join(docs_args))
