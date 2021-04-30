@@ -38,6 +38,13 @@ cdef inline unsigned long checksum(bytes b, int checksum_length):
 cdef class BaseDatagram:
     """
     A base STANAG 4586 frame
+
+    :ivar payload: (bytes) message payload
+    :ivar sequence_no: (int) sequence no
+    :ivar source_id: (int) source ID
+    :ivar destination_id: (int) destination ID
+    :ivar message_type: (int) message type
+    :ivar message_properties: (int) message properties
     """
     def __init__(self, bytes payload, unsigned int sequence_no,
                  unsigned int source_id, unsigned int destination_id,

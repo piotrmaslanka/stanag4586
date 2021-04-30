@@ -10,6 +10,8 @@ Welcome to STANAG4586's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   base_frame
+
 
 
 Indices and tables
